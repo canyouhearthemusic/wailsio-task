@@ -3,16 +3,18 @@ package main
 import (
 	"context"
 	"fmt"
+	"wailsproject/backend/service/todolist"
 )
 
 // App struct
 type App struct {
-	ctx context.Context
+	ctx     context.Context
+	service todolist.Service
 }
 
 // NewApp creates a new App application struct
-func NewApp() *App {
-	return &App{}
+func NewApp(service todolist.Service) *App {
+	return &App{service: service}
 }
 
 // startup is called when the app starts. The context is saved

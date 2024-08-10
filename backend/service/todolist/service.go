@@ -1,6 +1,6 @@
 package todolist
 
-import "wailsproject/backend/internal/domain/todo"
+import "wailsproject/backend/domain/todo"
 
 type Service struct {
 	repo todo.Repository

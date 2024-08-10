@@ -12,8 +12,7 @@ import (
 var assets embed.FS
 
 func main() {
-
-	// Create an instance of the app structure
+	// TODO: continue here
 	app := NewApp()
 
 	// Create application with options

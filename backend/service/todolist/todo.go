@@ -3,7 +3,7 @@ package todolist
 import (
 	"context"
 	"fmt"
-	"wailsproject/backend/internal/domain/todo"
+	"wailsproject/backend/domain/todo"
 )
 
 func (s *Service) ListTodos(ctx context.Context) (res []*todo.Entity, err error) {
@@ -16,7 +16,7 @@ func (s *Service) ListTodos(ctx context.Context) (res []*todo.Entity, err error)
 }
 
 func (s *Service) CreateTodo(ctx context.Context, req *todo.Request) (err error) {
-	_, err = s.repo.Create(ctx, req)
+	err = s.repo.Create(ctx, req)
 	if err != nil {
 		err = fmt.Errorf("failed to create todo: %v", err.Error())
 	}
@@ -25,7 +25,7 @@ func (s *Service) CreateTodo(ctx context.Context, req *todo.Request) (err error)
 }
 
 func (s *Service) UpdateTodo(ctx context.Context, id string, req *todo.Request) (err error) {
-	_, err = s.repo.Update(ctx, id, req)
+	err = s.repo.Update(ctx, id, req)
 	if err != nil {
 		err = fmt.Errorf("failed to update todo: %v", err.Error())
 	}

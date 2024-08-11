@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"wailsproject/backend/internal/domain/todo"
-	"wailsproject/backend/internal/repository/postgres"
+	"wailsproject/backend/domain/todo"
 	"wailsproject/backend/pkg/store"
+	"wailsproject/backend/repository/postgres"
 )
 
 type Repository struct {

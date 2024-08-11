@@ -2,8 +2,9 @@ package postgres
 
 import (
 	"context"
-	"wailsproject/backend/internal/domain/todo"
+	"wailsproject/backend/domain/todo"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -25,7 +26,7 @@ func (r *TodoRepository) Create(ctx context.Context, req *todo.Request) (err err
 	return
 }
 
-func (r *TodoRepository) Delete(ctx context.Context, id string) (err error) {
+func (r *TodoRepository) Delete(ctx context.Context, id uuid.UUID) (err error) {
 	query := `DELETE FROM todos WHERE id = $1`
 
 	if _, err = r.db.ExecContext(ctx, query, id); err != nil {
@@ -45,7 +46,7 @@ func (r *TodoRepository) List(ctx context.Context) (res []*todo.Entity, err erro
 	return
 }
 
-func (r *TodoRepository) Update(ctx context.Context, id string, req *todo.Request) (err error) {
+func (r *TodoRepository) Update(ctx context.Context, id uuid.UUID, req *todo.Request) (err error) {
 	query := "UPDATE todos SET body = :body, priority = :priority, deadline = :deadline, updated_at = CURRENT_TIMESTAMP WHERE id = :id"
 
 	if _, err = r.db.NamedExecContext(ctx, query, req); err != nil {

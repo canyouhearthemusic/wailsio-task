@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"wailsproject/backend/domain/todo"
+
+	"github.com/google/uuid"
 )
 
 func (s *Service) ListTodos(ctx context.Context) (res []*todo.Entity, err error) {
@@ -24,7 +26,7 @@ func (s *Service) CreateTodo(ctx context.Context, req *todo.Request) (err error)
 	return
 }
 
-func (s *Service) UpdateTodo(ctx context.Context, id string, req *todo.Request) (err error) {
+func (s *Service) UpdateTodo(ctx context.Context, id uuid.UUID, req *todo.Request) (err error) {
 	err = s.repo.Update(ctx, id, req)
 	if err != nil {
 		err = fmt.Errorf("failed to update todo: %v", err.Error())
@@ -33,7 +35,7 @@ func (s *Service) UpdateTodo(ctx context.Context, id string, req *todo.Request) 
 	return
 }
 
-func (s *Service) DeleteTodo(ctx context.Context, id string) (err error) {
+func (s *Service) DeleteTodo(ctx context.Context, id uuid.UUID) (err error) {
 	err = s.repo.Delete(ctx, id)
 	if err != nil {
 		err = fmt.Errorf("failed to delete todo: %v", err.Error())

@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CreateTodo, ListTodos, DeleteTodo, ToggleStatusTodo } from "_wailsjs";
-import { onBeforeMount, reactive, ref, watch } from "vue";
+import { onBeforeMount, reactive, ref, computed } from "vue";
 import moment from "moment";
 
 
@@ -23,6 +23,7 @@ const form = reactive({
 });
 
 const todos = ref([]);
+const selectedStatus = ref('all');
 
 onBeforeMount(async () => {
     await fetchTodos();
@@ -67,11 +68,31 @@ async function toggleStatusTodo(id, status) {
 function formatDate(dateString) {
     return moment(dateString).utcOffset(0).format('D MMM YYYY, hh:mm')
 }
+
+const filteredTodos = computed(() => {
+    if (selectedStatus.value === "all") return todos.value;
+    return todos.value.filter(todo => todo.status === selectedStatus.value);
+});
 </script>
 
 <template>
     <div>
-        <h1 class="text-2xl font-semibold text-center">Todo List</h1>
+        <div class="flex justify-between items-center">
+            <h1 class="flex-1 text-2xl font-semibold text-center">Todo List</h1>
+
+            <Select v-model="selectedStatus">
+                <SelectTrigger class="w-[80px] max-w-[80px]">
+                    <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectItem value="all"> All </SelectItem>
+                        <SelectItem value="in-progress"> In-Progress </SelectItem>
+                        <SelectItem value="completed"> Completed </SelectItem>
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
+        </div>
     
         <Input
             id="body"
@@ -110,7 +131,7 @@ function formatDate(dateString) {
 
     <div class="w-full grid grid-cols-4 gap-12 mt-6">
         <div
-            v-for="todo in todos"
+            v-for="todo in filteredTodos"
             :key="todo.id"
             class="border border-gray-300 rounded-md px-4 py-2.5 min-w-64 max-w-64 max-h-[400px] overflow-scroll"
         >

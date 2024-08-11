@@ -1,5 +1,27 @@
 # README
 
+## Prerequisites
+- Go 1.22.2
+- NPM
+
+## Project setting up
+```
+git clone https://github.com/canyouhearthemusic/wailsio-task.git
+cd wailsio-task
+```
+
+macOS/Linux:
+```
+cp .env.example .env
+```
+Windows:
+```
+copy .env.example .env
+```
+
+Then configure it by yourself ;)
+
+
 ## About
 
 This is the official Wails Vue template.

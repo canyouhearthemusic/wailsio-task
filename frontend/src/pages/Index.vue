@@ -9,12 +9,22 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CreateTodo, ListTodos, DeleteTodo, ToggleStatusTodo } from "_wailsjs";
 import { onBeforeMount, reactive, ref, computed } from "vue";
 import moment from "moment";
-
 
 const form = reactive({
     body: "",
@@ -23,7 +33,8 @@ const form = reactive({
 });
 
 const todos = ref([]);
-const selectedStatus = ref('all');
+const selectedStatus = ref("all");
+const todoToDelete = ref(null);
 
 onBeforeMount(async () => {
     await fetchTodos();
@@ -61,18 +72,25 @@ async function toggleStatusTodo(id, status) {
         await ToggleStatusTodo(id, status);
         await fetchTodos();
     } catch (error) {
-        console.error("Failed to complete a todo:", error)
+        console.error("Failed to complete a todo:", error);
     }
 }
 
 function formatDate(dateString) {
-    return moment(dateString).utcOffset(0).format('D MMM YYYY, hh:mm')
+    return moment(dateString).utcOffset(0).format("D MMM YYYY, hh:mm");
 }
 
 const filteredTodos = computed(() => {
     if (selectedStatus.value === "all") return todos.value;
-    return todos.value.filter(todo => todo.status === selectedStatus.value);
+    return todos.value.filter((todo) => todo.status === selectedStatus.value);
 });
+
+function confirmDeleteTodo() {
+    if (todoToDelete.value) {
+        deleteTodo(todoToDelete.value);
+        todoToDelete.value = null;
+    }
+}
 </script>
 
 <template>
@@ -87,13 +105,15 @@ const filteredTodos = computed(() => {
                 <SelectContent>
                     <SelectGroup>
                         <SelectItem value="all"> All </SelectItem>
-                        <SelectItem value="in-progress"> In-Progress </SelectItem>
+                        <SelectItem value="in-progress">
+                            In-Progress
+                        </SelectItem>
                         <SelectItem value="completed"> Completed </SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
         </div>
-    
+
         <Input
             id="body"
             v-model="form.body"
@@ -101,7 +121,7 @@ const filteredTodos = computed(() => {
             class="mt-4 bg-white"
             placeholder="What to do?"
         />
-    
+
         <div class="w-full mt-4 flex gap-x-3">
             <Select v-model="form.priority">
                 <SelectTrigger class="w-full">
@@ -117,7 +137,7 @@ const filteredTodos = computed(() => {
                 </SelectContent>
             </Select>
         </div>
-    
+
         <Input
             id="date"
             v-model="form.datetime"
@@ -125,7 +145,7 @@ const filteredTodos = computed(() => {
             class="mt-4 bg-white"
             placeholder="Deadline"
         />
-    
+
         <Button class="w-full mt-3" @click="createTodo"> Create </Button>
     </div>
 
@@ -138,17 +158,42 @@ const filteredTodos = computed(() => {
             <header class="flex justify-between items-center">
                 <p
                     class="font-semibold text-2xl"
-                    :class="todo.status == 'completed' ? 'line-through decoration-from-font' : ''"
+                    :class="
+                        todo.status == 'completed'
+                            ? 'line-through decoration-from-font'
+                            : ''
+                    "
                 >
                     {{ todo.body }}
                 </p>
 
                 <div class="flex gap-x-2">
-                    <TrashIcon
-                        as="button"
-                        class="size-5 text-black hover:text-red-600 transition-all"
-                        @click="deleteTodo(todo.id)"
-                    />
+                    <AlertDialog>
+                        <AlertDialogTrigger as-child>
+                            <TrashIcon
+                                as="button"
+                                class="size-5 text-black hover:text-red-600 transition-all"
+                                @click="todoToDelete = todo.id"
+                            />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete this task.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction @click="confirmDeleteTodo">
+                                    Continue
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                     <CheckIcon
                         as="button"
                         class="size-5 text-black hover:text-green-500 transition-all"

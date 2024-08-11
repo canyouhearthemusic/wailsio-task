@@ -6,6 +6,10 @@ export function CreateTodo(arg1, arg2, arg3) {
   return window['go']['main']['App']['CreateTodo'](arg1, arg2, arg3);
 }
 
+export function DeleteTodo(arg1) {
+  return window['go']['main']['App']['DeleteTodo'](arg1);
+}
+
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
@@ -14,6 +18,6 @@ export function ListTodos() {
   return window['go']['main']['App']['ListTodos']();
 }
 
-export function UpdateTodo(arg1, arg2, arg3, arg4) {
-  return window['go']['main']['App']['UpdateTodo'](arg1, arg2, arg3, arg4);
+export function ToggleStatusTodo(arg1, arg2) {
+  return window['go']['main']['App']['ToggleStatusTodo'](arg1, arg2);
 }

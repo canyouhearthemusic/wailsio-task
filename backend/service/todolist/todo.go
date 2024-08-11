@@ -26,10 +26,10 @@ func (s *Service) CreateTodo(ctx context.Context, req *todo.Request) (err error)
 	return
 }
 
-func (s *Service) UpdateTodo(ctx context.Context, id uuid.UUID, req *todo.Request) (err error) {
-	err = s.repo.Update(ctx, id, req)
+func (s *Service) ToggleStatusTodo(ctx context.Context, id uuid.UUID, status string) (err error) {
+	err = s.repo.ToggleStatus(ctx, id, status)
 	if err != nil {
-		err = fmt.Errorf("failed to update todo: %v", err.Error())
+		err = fmt.Errorf("failed to complete a todo: %v", err.Error())
 	}
 
 	return

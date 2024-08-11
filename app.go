@@ -68,21 +68,10 @@ func (a *App) ListTodos() ([]*todo.Entity, error) {
 	return a.service.ListTodos(a.ctx)
 }
 
-func (a *App) UpdateTodo(id uuid.UUID, body string, priority string, deadline string) error {
-	dl, err := convertDateTime(deadline)
-	if err != nil {
-		return fmt.Errorf("failed to convert a deadline: %s", err.Error())
-	}
+func (a *App) DeleteTodo(id uuid.UUID) error {
+	return a.service.DeleteTodo(a.ctx, id)
+}
 
-	todo := &todo.Request{
-		Body:     body,
-		Priority: priority,
-		Deadline: dl,
-	}
-
-	if err := todo.Validate(); err != nil {
-		return err
-	}
-
-	return a.service.UpdateTodo(a.ctx, id, todo)
+func (a *App) ToggleStatusTodo(id uuid.UUID, status string) error {
+	return a.service.ToggleStatusTodo(a.ctx, id, status)
 }

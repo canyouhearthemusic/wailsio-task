@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"wailsproject/backend/domain/todo"
 
 	"github.com/google/uuid"
@@ -37,7 +38,7 @@ func (r *TodoRepository) Delete(ctx context.Context, id uuid.UUID) (err error) {
 }
 
 func (r *TodoRepository) List(ctx context.Context) (res []*todo.Entity, err error) {
-	query := `SELECT * FROM todos`
+	query := `SELECT * FROM todos ORDER BY created_at DESC, updated_at desc`
 
 	if err = r.db.SelectContext(ctx, &res, query); err != nil {
 		return
@@ -46,10 +47,18 @@ func (r *TodoRepository) List(ctx context.Context) (res []*todo.Entity, err erro
 	return
 }
 
-func (r *TodoRepository) Update(ctx context.Context, id uuid.UUID, req *todo.Request) (err error) {
-	query := "UPDATE todos SET body = :body, priority = :priority, deadline = :deadline, updated_at = CURRENT_TIMESTAMP WHERE id = :id"
+func (r *TodoRepository) ToggleStatus(ctx context.Context, id uuid.UUID, status string) (err error) {
+	var st string
 
-	if _, err = r.db.NamedExecContext(ctx, query, req); err != nil {
+	if status == "completed" {
+		st = "in-progress"
+	} else {
+		st = "completed"
+	}
+
+	query := fmt.Sprintf("UPDATE todos SET status = '%s' WHERE id = $1", st)
+
+	if _, err = r.db.ExecContext(ctx, query, id); err != nil {
 		return
 	}
 

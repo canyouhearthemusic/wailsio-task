@@ -1,5 +1,5 @@
 <script setup>
-import { PencilIcon, TrashIcon, CheckIcon } from "@heroicons/vue/24/outline";
+import { TrashIcon, CheckIcon } from "@heroicons/vue/24/outline";
 import {
     Select,
     SelectContent,
@@ -11,8 +11,10 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CreateTodo, ListTodos } from "_wailsjs";
-import { onBeforeMount, reactive, ref } from "vue";
+import { CreateTodo, ListTodos, DeleteTodo, ToggleStatusTodo } from "_wailsjs";
+import { onBeforeMount, reactive, ref, watch } from "vue";
+import moment from "moment";
+
 
 const form = reactive({
     body: "",
@@ -42,6 +44,28 @@ async function createTodo() {
     } catch (error) {
         console.error("Failed to create todo:", error);
     }
+}
+
+async function deleteTodo(id) {
+    try {
+        await DeleteTodo(id);
+        await fetchTodos();
+    } catch (error) {
+        console.error("Failed to delete todo:", error);
+    }
+}
+
+async function toggleStatusTodo(id, status) {
+    try {
+        await ToggleStatusTodo(id, status);
+        await fetchTodos();
+    } catch (error) {
+        console.error("Failed to complete a todo:", error)
+    }
+}
+
+function formatDate(dateString) {
+    return moment(dateString).utcOffset(0).format('D MMM YYYY, hh:mm')
 }
 </script>
 
@@ -84,24 +108,30 @@ async function createTodo() {
         <Button class="w-full mt-3" @click="createTodo"> Create </Button>
     </div>
 
-    <div class="w-full grid grid-cols-4 gap-10 mt-6">
+    <div class="w-full grid grid-cols-4 gap-12 mt-6">
         <div
             v-for="todo in todos"
             :key="todo.id"
-            class="border border-gray-300 rounded-md px-4 py-2.5 w-64 max-w-64 max-h-[400px] overflow-scroll"
+            class="border border-gray-300 rounded-md px-4 py-2.5 min-w-64 max-w-64 max-h-[400px] overflow-scroll"
         >
             <header class="flex justify-between items-center">
-                <p class="font-semibold text-2xl">{{ todo.body }}</p>
+                <p
+                    class="font-semibold text-2xl"
+                    :class="todo.status == 'completed' ? 'line-through decoration-from-font' : ''"
+                >
+                    {{ todo.body }}
+                </p>
 
                 <div class="flex gap-x-2">
-                    <PencilIcon
-                        class="size-5 text-black hover:text-gray-500 transition-all"
-                    />
                     <TrashIcon
+                        as="button"
                         class="size-5 text-black hover:text-red-600 transition-all"
+                        @click="deleteTodo(todo.id)"
                     />
                     <CheckIcon
+                        as="button"
                         class="size-5 text-black hover:text-green-500 transition-all"
+                        @click="toggleStatusTodo(todo.id, todo.status)"
                     />
                 </div>
             </header>
@@ -111,17 +141,16 @@ async function createTodo() {
                     Status:
                     <span>{{ todo.status }}</span>
                 </p>
+
+                <p>
+                    Priority:
+                    <span>{{ todo.priority }}</span>
+                </p>
             </main>
 
             <footer class="mt-4 border-t border-gray-800 pt-2">
                 <p class="text-sm italic text-gray-700">
-                    Created at: {{ todo.created_at }}
-                </p>
-                <p class="text-sm italic text-gray-700">
-                    Last changed at: {{ todo.updated_at }}
-                </p>
-                <p class="text-sm italic text-gray-700">
-                    Deadline: {{ todo.deadline }}
+                    Deadline: {{ formatDate(todo.deadline) }}
                 </p>
             </footer>
         </div>
